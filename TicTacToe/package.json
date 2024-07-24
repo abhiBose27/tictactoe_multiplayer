@@ -1,0 +1,14 @@
+{
+  "name": "tictactoe_game_class",
+  "version": "1.0.0",
+  "description": "Class for TicTacToe",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "tictactoe"
+  ],
+  "author": "",
+  "license": "ISC"
+}
