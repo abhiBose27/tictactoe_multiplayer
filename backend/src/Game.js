@@ -1,5 +1,5 @@
 import {v4 as uuidv4 } from "uuid"
-import {TicTacToe} from "../../TicTacToe/index.js"
+import {TicTacToe} from "tictactoe_game_class"
 
 export class Game {
 
