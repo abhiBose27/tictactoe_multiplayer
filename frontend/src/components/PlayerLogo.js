@@ -15,7 +15,7 @@ export const PlayerLogo = React.memo(({player, userId, name}) => {
     
     return (
         <div>
-            <img className="ui medium circular image" alt="logo" src={image}/>
+            <img className="ui circular image" alt="logo" src={image}/>
             <p>{playerDisplayString()}</p>
         </div>
     )

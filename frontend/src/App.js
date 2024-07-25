@@ -15,7 +15,7 @@ function App() {
         <div style={{
             width: windowSize.width,
             height: windowSize.height,
-            backgroundColor: "#181949",
+            backgroundColor: "#0C0D24",
             color: "white",
         }}>
             <Router>

@@ -12,7 +12,7 @@ export const MessageHeader = React.memo(({gameStatus}) => {
     }
 
     return (
-        <div className={getClassName()} style={{fontSize: "25pt"}}>
+        <div className={getClassName()}>
             {gameStatus.message}
         </div>
     )

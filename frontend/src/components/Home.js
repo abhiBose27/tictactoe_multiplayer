@@ -32,7 +32,7 @@ export const Home = () => {
             <div className="home">
                 <Logo/>
                 <Divider inverted vertical>Tic Tac Toe</Divider>
-                <Button inverted color="green" basic size="massive" onClick={triggerModal}>
+                <Button inverted basic onClick={triggerModal}>
                     <Icon className="globe small icon"/>Join a Game
                 </Button>
                 <Modal size="tiny" open={showUserNameModal} onClose={triggerModal}>

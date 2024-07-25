@@ -1,4 +1,4 @@
-import image from "../images/logo_image.png"
+import image from "../images/tictactoe_image.png"
 
 export const Logo = () => {
     return (

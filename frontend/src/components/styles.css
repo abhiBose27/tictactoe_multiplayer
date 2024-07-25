@@ -1,16 +1,13 @@
 .App-logo {
-    max-height: 50%;
-    pointer-events: none;
+  height: 50%;
+  pointer-events: none;
+  opacity: 0.3;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 40s linear;
   }
-}
-
-.App-link {
-  color: #61dafb;
 }
 
 @keyframes App-logo-spin {
@@ -22,52 +19,67 @@
   }
 }
 
-.home, .loading {
-    display: flex;
-    gap: 35%;
-    align-items: center;
-    margin-left: 10%;
+.ui.button {
+  font-size: 1vw;
+}
+
+.ui.divider {
+  font-size: 1.6vw;
+  pointer-events: none;
+}
+
+.ui.circular.image {
+  height: 50%;
+  width: 80%;
+  margin-left: 10%;
+}
+
+.ui.message {
+  text-align: center;
+  font-style: italic;
+  font-size: 4vh;
+  height: 10%;
+  padding-top: 1%;
+  opacity: 0.4;
 }
 
 .home {
   height: 100%;
-}
-
-.game {
-  margin-left: 10%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
 }
 
-.loading  {
-  margin-left: 20%;
+.loading, .game {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 10%;
+  margin-right: 10%;
 }
 
 header {
   background-color: black;
   color: #eee;
-  text-align: center;
   height: 10%;
-  padding-top: 1.5%;
   box-sizing: border-box;
-  position: relative;
   width: 100%;
-  vertical-align: center;
   margin-bottom: 1%;
+  padding-top: 1%;
+  text-align: center;
+  align-items: center;
 }
 
 p {
-	font-size: 16pt;
+	font-size: 2vh;
 	font-weight: bold;
+  font-style: italic;
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .title {
-  font-size: 20pt;
-}
-
-.message {
-  text-align: center;
-  font-style: italic;
+  font-size: 4vh;
 }
 
 .play-again {
@@ -76,15 +88,13 @@ p {
 }
 
 .tab-tic-tac-toe {
-	margin-left: 10%;
-	margin-right: 10%;
-	padding: 5px;
+	padding: 1%;
 	font-size: 4em;
 	font-family: sans-serif;
-	color: #444;
-	background: #F8F8F8;
-	width: 35%;
-	height: 600px;
+	color: #757474;
+	background: transparent;
+	width: 50%;
+	height: 60vh;
 	text-align: center;
 	vertical-align: center;
 }
