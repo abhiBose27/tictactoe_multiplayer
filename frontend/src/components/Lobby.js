@@ -20,15 +20,15 @@ export const Lobby = ({socket}) => {
 
     useEffect(() => {
         window.onpopstate = () => {
-            console.log("Exit from game")
             socket.send(JSON.stringify({
                 type: EXIT_GAME,
                 payload: {
                     userId: userId
                 }
             }))
+            navigate("/", {replace: true})
         }
-    }, [userId, socket])
+    }, [userId, socket, navigate])
 
     useEffect(() => {
         const parseMessage = (event) => {
