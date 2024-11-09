@@ -1,13 +1,35 @@
 import React from "react"
 import PropTypes from "prop-types"
+import { MESSAGES } from "../../../Messages"
 
 
-export const GridTable = React.memo(({onCellClick, board, winningPattern}) => {
+export const GridTable = React.memo(({
+    board,
+    socket,
+    userId,
+    winner
+}) => {
+    
     const getClassName = (row, col) => {
-        const isWinningMove = winningPattern.find((e) => e.row === row && e.col === col) !== undefined
-        if (isWinningMove)
-            return "winning-cell"
-        return "cell"
+        if (!winner)
+            return "cell"
+        return winner.winningPattern.find(e => e.row === row && e.col === col) !== undefined && userId === winner.userId ? "winning-cell": "cell"
+    }
+
+    const onCellClick = (event) => {
+        const id = event.target.id
+        const row = parseInt(id[0])
+        const col = parseInt(id[1])
+        socket.send(JSON.stringify({
+            type: MESSAGES.MOVE,
+            payload: {
+                userId,
+                move: {
+                    row: row,
+                    col: col
+                }
+            }
+        }))
     }
 
     return (
@@ -34,7 +56,8 @@ export const GridTable = React.memo(({onCellClick, board, winningPattern}) => {
 })
 
 GridTable.propTypes = {
-    onCellClick: PropTypes.func.isRequired,
+    userId: PropTypes.string,
     board: PropTypes.array.isRequired,
-    winningPattern: PropTypes.array.isRequired
+    socket: PropTypes.object.isRequired,
+    winner: PropTypes.object
 }

@@ -1,8 +1,27 @@
-export const MOVE      = "move"
-export const EXIT_GAME = "exit_game"
-export const JOIN_GAME = "join_game"
+export const MESSAGES = {
+    MOVE: "move",
+    LOGIN: "login",
+    LOGOUT: "logout",
+    SIGNUP: "signup",
+    EXIT_GAME: "exit_game",
+    JOIN_GAME: "join_game",
+    GAME_OVER: "game_over",
+    GAME_ERROR: "game_error",
+    GAME_ADDED: "game_added",
+    GAME_STARTED: "game_started",
+}
 
-export const GAME_ALERT = "game_alert"
-export const GAME_ADDED = "game_added"
-export const GAME_OVER  = "game_over"
-export const GAME_STARTED = "game_started"
+export const ERRORS = {
+    INVALID_SOCKET: "invalid_socket",
+    INVALID_CREDENTIALS: "invalid_credentials",
+    INVALID_MOVE: "invalid_move",
+    INVALID_PARAMETERS: "invalid_parameters",
+    MISMATCH_PASSWORDS: "missmatch_passwords",
+    USER_REGISTERED: "user_registered",
+    USERNAME_TAKEN: "username_taken",
+    USER_LOGGED_IN: "user_logged_in",
+    USER_LOGGED_OUT: "user_logged_out",
+    USER_NOT_LOGGED_IN: "user_not_logged_in",
+    USER_IN_GAME: "user_in_game",
+    USER_NOT_IN_GAME: "user_not_in_game",
+}
