@@ -11,7 +11,7 @@ import {
     updateUserStats 
 } from "../database/Users.js"
 import { connectToDb } from "../database/Connection.js"
-import { ERRORS, MESSAGES } from "../Messages.js"
+import { ERRORS, MESSAGES } from "../messages.js"
 
 
 export class GameManager {
