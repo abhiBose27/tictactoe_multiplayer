@@ -5,11 +5,11 @@ const { Client } = psql
 export const connectToDb = () => {
     dotenv.config()
     const client = new Client({
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_DATABASE,
+        user: process.env.PGUSER,
+        host: process.env.PGHOST,
+        port: process.env.PGPORT,
+        password: process.env.PGPASSWORD,
+        database: process.env.PGDATABASE,
     })
     client
 	.connect()
