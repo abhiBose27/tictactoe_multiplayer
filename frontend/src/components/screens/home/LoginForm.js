@@ -17,7 +17,13 @@ import { MESSAGES } from "../../../Messages"
 import { initFormState } from "../../../Reducer"
 
 
-export const LoginForm = ({socket, authError, setAuthError, triggerModal}) => {
+export const LoginForm = ({
+    socket, 
+    authError,
+    windowSize,
+    setAuthError, 
+    triggerModal
+}) => {
     const [signUp, setSignUp]       = useState(false)
     const [formState, setFormState] = useState(initFormState)
 
@@ -98,14 +104,14 @@ export const LoginForm = ({socket, authError, setAuthError, triggerModal}) => {
                                     <MessageHeader>{authError}</MessageHeader>
                                 </Message>
                             </FormField>}
-                            <Button content={signUp ? "Sign Up" : "Log In"} primary/>
+                            <Button size="small" content={signUp ? "Sign Up" : "Log In"} primary/>
                         </Form>
                     </GridColumn>
                     <GridColumn verticalAlign="middle">
                         <Button onClick={onClickSignUp} content={signUp ? "Log In": "Sign Up"} icon="signup" size="big" />
                     </GridColumn>
                 </Grid>
-                <Divider vertical>Or</Divider>
+                {windowSize.width > 767 && <Divider vertical>Or</Divider>}
             </Segment>
         </Modal>
     )
@@ -115,5 +121,6 @@ LoginForm.propTypes = {
     authError: PropTypes.string,
     socket: PropTypes.object.isRequired,
     setAuthError: PropTypes.func.isRequired,
-    triggerModal: PropTypes.func.isRequired
+    triggerModal: PropTypes.func.isRequired,
+    windowSize: PropTypes.object.isRequired
 }

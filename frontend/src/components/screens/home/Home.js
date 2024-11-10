@@ -10,13 +10,18 @@ import { ACTIONS } from "../../../Actions"
 import { initUserState } from "../../../Reducer"
 
 
-export const Home = ({socket}) => {
+export const Home = ({socket, windowSize}) => {
     const [login, setLogin]         = useState(false)
     const [authError, setAuthError] = useState(null)
     const dispatch                  = useDispatch()
     const navigate                  = useNavigate()
     const { user, isLoggedIn }      = useSelector(state => state.user)
     const { userId, userName }      = user
+    const { height, width }         = windowSize
+
+    // For dynamic resolution
+    const logoLength                = Math.min(width, height) * 0.6
+    const fontSize                  = Math.min(width, height) * (isLoggedIn ? 0.06 : 0.08)
 
     const triggerModal = (e) => {
         setAuthError(null)
@@ -92,36 +97,42 @@ export const Home = ({socket}) => {
 
     return (
             <div className="home">
-                <img src={image} className="App-logo" alt="logo" />
+                <img 
+                    alt="logo"
+                    src={image}
+                    className="app-logo"
+                    style={{height: logoLength, width: logoLength}}
+                />
                 <div>
-                    <p className="home-title">{`Welcome to Tic Tac Toe ${userName ?? ""}`}</p>
-                   {
-                        isLoggedIn ?
-                        <>
+                    <p style={{fontSize: fontSize}}>
+                        {`Welcome to Tic Tac Toe ${userName ?? ""}`}
+                    </p>
+                    <div className="home-btns">
+                        {isLoggedIn ? <>
                             <Button color="teal" size="large" onClick={onClickPlayGame}>
                                 <Icon className="globe small icon"/>Join a Game
                             </Button>
                             <Button color="teal" size="large" onClick={onClickLogOut}>
                                 <Icon className="log out icon"/>Log Out
                             </Button>
-                        </> : 
+                        </> :
                         <Button color="teal" size="large" onClick={triggerModal}>
                             <Icon className="signup icon"/>Log In
-                        </Button>
-                    }
+                        </Button>}
+                    </div>
                 </div>
-                {
-                    login && <LoginForm
-                        socket={socket}
-                        authError={authError}
-                        setAuthError={setAuthError}
-                        triggerModal={triggerModal}
-                    />
-                }
+                {login && <LoginForm
+                    socket={socket}
+                    authError={authError}
+                    windowSize={windowSize}
+                    setAuthError={setAuthError}
+                    triggerModal={triggerModal}
+                />}
             </div>
     )
 }
 
 Home.propTypes = {
-    socket: PropTypes.object.isRequired
+    socket: PropTypes.object.isRequired,
+    windowSize: PropTypes.object.isRequired
 }

@@ -1,11 +1,10 @@
-.App-logo {
-  height: 60%;
+.app-logo {
   pointer-events: none;
   opacity: 0.8;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
+  .app-logo {
     animation: App-logo-spin infinite 40s linear;
   }
 }
@@ -43,8 +42,19 @@
   margin-right: 8%;
 }
 
-.home-title {
-  font-size: 6vh;
+.home-btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (max-width: 1051px) {
+  .home {
+    display: flex;
+    margin: 0;
+    flex-direction: column;
+    justify-content: space-around;
+  }
 }
 
 .loading, .game {

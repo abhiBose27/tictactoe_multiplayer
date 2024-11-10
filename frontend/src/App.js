@@ -20,7 +20,7 @@ function App() {
         }}> 
             {socket && <Router>
                 <Routes>
-                    <Route path="/" element={<Home socket={socket}/>}></Route>
+                    <Route path="/" element={<Home socket={socket} windowSize={windowSize}/>}></Route>
                     <Route path="/lobby" element={<Lobby socket={socket}/>}></Route>
                     <Route path="/game/:gameId" element={<Game socket={socket}/>}></Route>
                 </Routes>
