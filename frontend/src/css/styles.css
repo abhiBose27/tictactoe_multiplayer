@@ -30,7 +30,7 @@
 .ui.circular.image {
   height: 40%;
   width: 70%;
-  margin-left: 10%;
+  margin-inline: auto;
 }
 
 .home {
@@ -48,21 +48,6 @@
   align-items: center;
 }
 
-@media screen and (max-width: 1051px) {
-  .home {
-    display: flex;
-    margin: 0;
-    flex-direction: column;
-    justify-content: space-around;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  input, select, textarea {
-       font-size: 16px !important;
-  }
-}
-
 .loading, .game {
   display: flex;
   align-items: center;
@@ -72,10 +57,11 @@
 }
 
 p {
-	font-size: 2vh;
+  font-size: large;
 	font-weight: bold;
   font-style: italic;
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  text-align: center;
 }
 
 .play-again {
@@ -146,8 +132,47 @@ p {
   }
 }
 
-
 .ui.message.field-signup {
   background: none;
   border: none;
+}
+
+@media screen and (max-width: 1051px) {
+  .home {
+    display: flex;
+    margin: 0;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  .ui.circular.image {
+    height: 50%;
+    width: 20%;
+  }
+
+  p {
+    font-size: small;
+  }
+
+  .tab-tic-tac-toe {
+    width: 100%;
+  }
+
+  .loading, .game {
+    margin: 0;
+  }
+
+  .cell, .winning-cell {
+    border-left: 2px solid #444;
+	  border-bottom: 2px solid #444;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  .tab-tic-tac-toe {
+    width: 150%;
+  }
 }
