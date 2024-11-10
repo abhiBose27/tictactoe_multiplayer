@@ -49,6 +49,7 @@
 }
 
 .loading, .game {
+  height: 70%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -71,7 +72,7 @@ p {
 
 .tab-tic-tac-toe {
 	padding: 1%;
-	font-size: 4em;
+	font-size: xx-large;
 	font-family: sans-serif;
 	color: #757474;
 	background: transparent;

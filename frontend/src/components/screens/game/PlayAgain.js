@@ -38,10 +38,10 @@ export const PlayAgain = React.memo(({winner, user}) => {
                 </p>
                 <Modal.Actions>
                     <Progress percent={levelProgress.updatedXp} label={`Lvl ${levelProgress.updatedLevel}`} progress indicating/>
-                    <Button basic color="red" onClick={onClick}>
+                    <Button size="small" basic color="red" onClick={onClick}>
                         <Icon name="remove"/>No
                     </Button>
-                    <Button basic color="green" onClick={onClick}>
+                    <Button size="small" basic color="green" onClick={onClick}>
                         <Icon name="checkmark"/>Yes
                     </Button>
                 </Modal.Actions>
