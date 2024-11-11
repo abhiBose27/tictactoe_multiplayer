@@ -8,7 +8,7 @@ export const PlayerLogo = React.memo(({player, userId}) => {
     return (
         <div>
             <img className="ui circular image" alt="logo" src={image}/>
-            <p>{player.userId === userId ? `(You) ${player.userName}` : player.userName}</p>
+            <p className="logo-name">{player.userId === userId ? `(You) ${player.userName}` : player.userName}</p>
         </div>
     )
 })

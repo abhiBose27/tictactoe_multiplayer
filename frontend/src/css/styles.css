@@ -33,7 +33,7 @@
   margin-inline: auto;
 }
 
-.home {
+.home, .loading, .game {
   height: 100%;
   display: flex;
   justify-content: space-between;
@@ -50,36 +50,27 @@
 
 .loading, .game {
   height: 70%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   margin-left: 10%;
   margin-right: 10%;
 }
 
 p {
+  text-align: center;
   font-size: large;
 	font-weight: bold;
   font-style: italic;
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  text-align: center;
 }
 
 .play-again {
   color: #000;
-  text-align: center;
 }
 
 .tab-tic-tac-toe {
 	padding: 1%;
-	font-size: xx-large;
-	font-family: sans-serif;
-	color: #757474;
-	background: transparent;
-	width: 50%;
+  width: 50%;
 	height: 60vh;
-	text-align: center;
-	vertical-align: center;
+  border: 5px solid #444;
 }
 
 .cell:first-child, .winning-cell:first-child {
@@ -91,17 +82,21 @@ p {
 }
 
 .cell, .winning-cell {
-	cursor: pointer;
-	height: 30%;
+  height: 30%;
 	width: 20%;
-  border-collapse: collapse;
-	border-left: 5px solid #444;
+  color: #ece1e1;
+	cursor: pointer;
+  font-family: sans-serif;
+  font-size: xx-large;
+  text-align: center;
+  border-left: 5px solid #444;
 	border-bottom: 5px solid #444;
-  font-weight: normal;
+  border-collapse: collapse;
 }
 
-.cell:hover, .winning-cell:hover {
+.cell:hover {
 	background: #ECECEC;
+  color: #000;
 }
 
 .winning-cell {
@@ -146,33 +141,27 @@ p {
     justify-content: space-around;
   }
 
-  .ui.circular.image {
-    height: 50%;
-    width: 20%;
-  }
-
-  p {
-    font-size: small;
-  }
-
   .tab-tic-tac-toe {
+    border: 2px solid #444;
     width: 100%;
-  }
-
-  .loading, .game {
-    margin: 0;
   }
 
   .cell, .winning-cell {
     border-left: 2px solid #444;
 	  border-bottom: 2px solid #444;
   }
+
+  .game .ui.circular.image, .game .logo-name {
+    display: none;
+  }
+
 }
 
 @media screen and (max-width: 767px) {
   input, select, textarea {
     font-size: 16px !important;
   }
+
   .tab-tic-tac-toe {
     width: 150%;
   }
