@@ -18,9 +18,9 @@ import { initFormState } from "../../../Reducer"
 
 
 export const LoginForm = ({
+    width,
     socket, 
     authError,
-    windowSize,
     setAuthError, 
     triggerModal
 }) => {
@@ -111,7 +111,7 @@ export const LoginForm = ({
                         <Button onClick={onClickSignUp} content={signUp ? "Log In": "Sign Up"} icon="signup" size="big" />
                     </GridColumn>
                 </Grid>
-                {windowSize.width > 767 && <Divider vertical>Or</Divider>}
+                {width > 767 && <Divider vertical>Or</Divider>}
             </Segment>
         </Modal>
     )
@@ -119,8 +119,8 @@ export const LoginForm = ({
 
 LoginForm.propTypes = {
     authError: PropTypes.string,
+    width: PropTypes.number.isRequired,
     socket: PropTypes.object.isRequired,
     setAuthError: PropTypes.func.isRequired,
     triggerModal: PropTypes.func.isRequired,
-    windowSize: PropTypes.object.isRequired
 }

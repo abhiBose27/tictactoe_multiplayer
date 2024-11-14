@@ -1,23 +1,24 @@
 import PropTypes from "prop-types"
-import image from "../../../images/tictactoe_image.png"
+import tictactoeImg from "../../../images/tictactoe_image.png"
 import { useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useState, useEffect } from "react"
 import { Button, Icon } from "semantic-ui-react"
 import { LoginForm } from "./LoginForm"
+import { useWindowSize } from "../../../hooks/useWindowSize"
 import { ERRORS, MESSAGES } from "../../../Messages"
 import { ACTIONS } from "../../../Actions"
 import { initUserState } from "../../../Reducer"
 
 
-export const Home = ({socket, windowSize}) => {
+export const Home = ({socket}) => {
     const [login, setLogin]         = useState(false)
     const [authError, setAuthError] = useState(null)
     const dispatch                  = useDispatch()
     const navigate                  = useNavigate()
     const { user, isLoggedIn }      = useSelector(state => state.user)
+    const { height, width }         = useWindowSize()
     const { userId, userName }      = user
-    const { height, width }         = windowSize
 
     // For dynamic resolution
     const logoLength                = Math.min(width, height) * 0.6
@@ -96,43 +97,42 @@ export const Home = ({socket, windowSize}) => {
     }, [socket, dispatch, navigate])
 
     return (
-            <div className="home">
-                <img 
-                    alt="logo"
-                    src={image}
-                    className="app-logo"
-                    style={{height: logoLength, width: logoLength}}
-                />
-                <div>
-                    <p style={{fontSize: fontSize}}>
-                        {`Welcome to Tic Tac Toe ${userName ?? ""}`}
-                    </p>
-                    <div className="home-btns">
-                        {isLoggedIn ? <>
-                            <Button color="teal" size="large" onClick={onClickPlayGame}>
-                                <Icon className="globe small icon"/>Join a Game
-                            </Button>
-                            <Button color="teal" size="large" onClick={onClickLogOut}>
-                                <Icon className="log out icon"/>Log Out
-                            </Button>
-                        </> :
-                        <Button color="teal" size="large" onClick={triggerModal}>
-                            <Icon className="signup icon"/>Log In
-                        </Button>}
-                    </div>
+        <div className="home">
+            <img 
+                alt="logo"
+                src={tictactoeImg}
+                className="app-logo"
+                style={{height: logoLength, width: logoLength}}
+            />
+            <div>
+                <p style={{fontSize: fontSize}}>
+                    {`Welcome to Tic Tac Toe ${userName ?? ""}`}
+                </p>
+                <div className="home-btns">
+                    {isLoggedIn ? <>
+                        <Button color="teal" size="large" onClick={onClickPlayGame}>
+                            <Icon className="globe small icon"/>Join a Game
+                        </Button>
+                        <Button color="teal" size="large" onClick={onClickLogOut}>
+                            <Icon className="log out icon"/>Log Out
+                        </Button>
+                    </> :
+                    <Button color="teal" size="large" onClick={triggerModal}>
+                        <Icon className="signup icon"/>Log In
+                    </Button>}
                 </div>
-                {login && <LoginForm
-                    socket={socket}
-                    authError={authError}
-                    windowSize={windowSize}
-                    setAuthError={setAuthError}
-                    triggerModal={triggerModal}
-                />}
             </div>
+            {login && <LoginForm
+                width={width}
+                socket={socket}
+                authError={authError}
+                setAuthError={setAuthError}
+                triggerModal={triggerModal}
+            />}
+        </div>
     )
 }
 
 Home.propTypes = {
     socket: PropTypes.object.isRequired,
-    windowSize: PropTypes.object.isRequired
 }
