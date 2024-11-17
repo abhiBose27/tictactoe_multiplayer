@@ -55,12 +55,16 @@ export class Game {
     setWinner(user) {
         if (this.isGameOver)
             return
-        if (this.player1.userId === user.userId) {
+        if (!this.player1 || !this.player2) {
+            this.isGameOver = true
+            return
+        }
+        if (user.userId === this.player1.userId) {
             this.player1.levelUp()
             this.player2.levelDown()
             this.winnerUserId = this.player1.userId
         }
-        if (this.player2.userId === user.userId) {
+        if (user.userId === this.player2.userId) {
             this.player2.levelUp()
             this.player1.levelDown()
             this.winnerUserId = this.player2.userId
@@ -69,14 +73,19 @@ export class Game {
     }
 
     forfeitGame(user) {
-        if (this.isGameOver)
+        if (this.isGameOver && this.isGameForfeit)
             return
-        if (this.player1.userId === user.userId) {
+        if (!this.player1 || !this.player2) {
+            this.isGameOver = true
+            this.isGameForfeit = true
+            return
+        }
+        if (user.userId === this.player1.userId) {
             this.player2.levelUp()
             this.player1.levelDown()
             this.winnerUserId = this.player2.userId
         }
-        if (this.player2.userId === user.userId) {
+        if (user.userId === this.player2.userId) {
             this.player1.levelUp()
             this.player2.levelDown()
             this.winnerUserId = this.player1.userId
@@ -86,7 +95,7 @@ export class Game {
     }
 
     makeMove(user, move) {
-        if (this.isGameOver)
+        if (this.isGameOver || !this.player1 || !this.player2)
             return false
         if (this.player1.userId === user.userId && !this.board.isValid(move, "X"))
             return false

@@ -50,9 +50,8 @@ export class GameManager {
         return {
             [MESSAGES.LOGIN]: this.login.bind(this),
             [MESSAGES.LOGOUT]: this.logout.bind(this),
-            [MESSAGES.MOVE]: this.makeMove.bind(this),
             [MESSAGES.SIGNUP]: this.signup.bind(this),
-            [MESSAGES.LOGOUT]: this.logout.bind(this),
+            [MESSAGES.MOVE]: this.makeMove.bind(this),
             [MESSAGES.EXIT_GAME]: this.exitGame.bind(this),
             [MESSAGES.JOIN_GAME]: this.joinGame.bind(this) 
         }
@@ -445,16 +444,16 @@ export class GameManager {
             payload: {
                 gameId: game.gameId,
                 crossPlayer: {
-                    userId: game.player1.userId,
-                    userName: game.player1.userName,
-                    level: game.player1.level,
-                    xp: game.player1.xp
+                    userId: game.player1?.userId,
+                    userName: game.player1?.userName,
+                    level: game.player1?.level,
+                    xp: game.player1?.xp
                 },
                 circlePlayer: {
-                    userId: game.player2.userId,
-                    userName: game.player2.userName,
-                    level: game.player2.level,
-                    xp: game.player2.xp
+                    userId: game.player2?.userId,
+                    userName: game.player2?.userName,
+                    level: game.player2?.level,
+                    xp: game.player2?.xp
                 },
                 isForfeit,
                 winnerUserId: game.getWinnerUserId(),

@@ -52,9 +52,7 @@ export const Home = ({socket}) => {
         window.onpopstate = () => {
             socket.send(JSON.stringify({
                 type: MESSAGES.EXIT_GAME,
-                payload: {
-                    userId: userId
-                }
+                payload: {userId}
             }))
             navigate("/", { replace: true })
         }
