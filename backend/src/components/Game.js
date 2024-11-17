@@ -1,5 +1,5 @@
-import {v4 as uuidv4 } from "uuid"
-import {TicTacToe} from "tictactoe_game_class"
+import { v4 as uuidv4 } from "uuid"
+import { TicTacToe } from "tictactoe_game_class"
 
 export class Game {
 
@@ -9,26 +9,19 @@ export class Game {
         this.board         = new TicTacToe(3)
         this.player1       = null
         this.player2       = null
-        this.winner        = null
+        this.winnerUserId  = null
         this.isDraw        = false
         this.lastMoveTime  = null
         this.isGameOver    = false
         this.isGameForfeit = false
     }
 
-    setPlayer(user) {
-        if (!this.player1)
-            this.player1 = user
-        else if (!this.player2) 
-            this.player2 = user
-    }
-
     getWinningPattern() {
         return this.board.getWinningPattern()
     }
 
-    getWinner() {
-        return this.winner
+    getWinnerUserId() {
+        return this.winnerUserId
     }
 
     getIsDraw() {
@@ -43,15 +36,51 @@ export class Game {
         return this.isGameForfeit
     }
 
+    setPlayer(user) {
+        const randomPlayer = Math.floor(Math.random() * 2) + 1
+        if (randomPlayer === 1) {
+            if (!this.player1)
+                this.player1 = user
+            else if (!this.player2)
+                this.player2 = user
+        }
+        else if (randomPlayer === 2) {
+            if (!this.player2)
+                this.player2 = user
+            else if (!this.player1)
+                this.player1 = user
+        }
+    }
+
+    setWinner(user) {
+        if (this.isGameOver)
+            return
+        if (this.player1.userId === user.userId) {
+            this.player1.levelUp()
+            this.player2.levelDown()
+            this.winnerUserId = this.player1.userId
+        }
+        if (this.player2.userId === user.userId) {
+            this.player2.levelUp()
+            this.player1.levelDown()
+            this.winnerUserId = this.player2.userId
+        }
+        this.isGameOver = true
+    }
+
     forfeitGame(user) {
         if (this.isGameOver)
             return
-        if (user.userId === this.player1.userId)
-            this.winner = this.player2
-        else if (user.userId === this.player2.userId)
-            this.winner = this.player1
-        if (this.winner)
-            this.winner.levelUp()
+        if (this.player1.userId === user.userId) {
+            this.player2.levelUp()
+            this.player1.levelDown()
+            this.winnerUserId = this.player2.userId
+        }
+        if (this.player2.userId === user.userId) {
+            this.player1.levelUp()
+            this.player2.levelDown()
+            this.winnerUserId = this.player1.userId
+        }
         this.isGameOver = true
         this.isGameForfeit = true
     }
@@ -66,11 +95,8 @@ export class Game {
 
         this.board.setMove(move)
         this.lastMoveTime = new Date()
-        if (this.board.isWinner()) {
-            this.winner = user
-            this.isGameOver = true
-            this.winner.levelUp()
-        }
+        if (this.board.isWinner()) 
+            this.setWinner(user)
         if (this.board.isDraw()) {
             this.isDraw = true
             this.isGameOver = true

@@ -1,5 +1,4 @@
 import assert from "assert"
-//import { appendFile } from "node:fs"
 import { Game } from "./Game.js"
 import { UserManager } from "./UserManager.js"
 import { User } from "./User.js"
@@ -72,11 +71,6 @@ export class GameManager {
 
     enableMessageHandler(socket) {
         socket.on("message", async (crude_message) => {
-            // Parse the message from the client
-           /*  appendFile("./logs/req.txt", `Received request ${Date.now()} ${crude_message}\n`, (err) => {
-                if (err)
-                    console.log(err)
-            }) */
             const message = JSON.parse(crude_message.toString())
             if (!this.#checkParams(message))
                 return this.#invalidParams(socket)
@@ -282,7 +276,7 @@ export class GameManager {
         }
 
         const user = this.userManager.getUserFromUserId(userId)
-        if (!this.#isMatchMade(user))
+        if (!this.pendingGameId)
             return this.#noPendingGame(user)
         return this.#pendingGame(user)
     }
@@ -416,10 +410,6 @@ export class GameManager {
             type: MESSAGES.GAME_ADDED,
             payload: {
                 gameId: game.gameId,
-                crossPlayer: {
-                    userId  : game.player1.userId,
-                    userName: game.player1.userName
-                }
             }
         })
         this.pendingGameId = game.gameId
@@ -450,34 +440,42 @@ export class GameManager {
 
     async #endGame(game) {
         const isForfeit = game.getIsGameForfeit()
-        const winner    = game.getWinner()
-        const result    = {
-            isForfeit,
-            winner : winner ? {
-                userId        : winner.userId,
-                level         : winner.level,
-                xp            : winner.xp,
-                winningPattern: game.getWinningPattern(),
-            } : null,
-        }
-        if (winner)
-            await updateUserStats(this.dbClient, winner.userId, winner.level, winner.xp)
         this.userManager.broadcast(game.gameId, {
             type: MESSAGES.GAME_OVER,
-            payload: result
+            payload: {
+                gameId: game.gameId,
+                crossPlayer: {
+                    userId: game.player1.userId,
+                    userName: game.player1.userName,
+                    level: game.player1.level,
+                    xp: game.player1.xp
+                },
+                circlePlayer: {
+                    userId: game.player2.userId,
+                    userName: game.player2.userName,
+                    level: game.player2.level,
+                    xp: game.player2.xp
+                },
+                isForfeit,
+                winnerUserId: game.getWinnerUserId(),
+                winningPattern: game.getWinningPattern()
+            }
         })
         const users = this.userManager.getUsersFromGameId(game.gameId)
-        users.forEach(u => this.userManager.removeUserFromGame(u.userId))
+        for (const u of users) {
+            await updateUserStats(this.dbClient, u.userId, u.level, u.xp)
+            this.userManager.removeUserFromGame(u.userId)
+        }
         this.removeGame(game.gameId)
     }
 
-    #isMatchMade(user) {
+    /* #isMatchMade(user) {
         if (!this.pendingGameId)
             return false
         const game = this.getGameFromGameId(this.pendingGameId)
         const level = game.player1.level
         return Math.abs(level - user.level) <= 2
-    }
+    } */
 
     #checkParams(message) {
         if (Object.keys(message).toString() !== ["type", "payload"].toString())
