@@ -3,32 +3,39 @@ import PropTypes from "prop-types"
 import { useNavigate } from "react-router"
 import { useDispatch } from "react-redux"
 import { Modal, Button, Icon, Progress } from "semantic-ui-react"
-import { initUserState } from "../../../Reducer"
+import { initState } from "../../../Reducer"
 import { ACTIONS } from "../../../Actions"
-import { sleep } from "../../../Helper"
+import { getInitialLevelProgress, sleep } from "../../../Helper"
 
 
-export const PlayAgain = React.memo(({winner, user}) => {
+export const PlayAgain = React.memo(({user, gameResult}) => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const [levelProgress, setLevelProgress] = useState({updatedXp: user.xp, updatedLevel: user.level})
+    const { userId, xp, level } = user
+    const { player1, player2 }  = gameResult
+    const [levelProgress, setLevelProgress] = useState(getInitialLevelProgress(userId, player1, player2, xp, level))
     
     const onClick = (e, { color }) => {
-        dispatch({type: ACTIONS.ADD_GAME, payload: initUserState.game})
-        if (winner && user.userId === winner.userId)
-            dispatch({type: ACTIONS.ADD_USER, payload: {...user, level: winner.level, xp: winner.xp}})
+        dispatch({type: ACTIONS.ADD_GAME, payload: initState.game})
+        dispatch({type: ACTIONS.ADD_USER, payload: {
+            ...user,
+            xp: levelProgress.updatedXp,
+            level: levelProgress.updatedLevel,
+        }})
         navigate(color === "red" ? "/" : "/lobby", { replace: true })
     }
 
     useEffect(() => {
         const incrementLevel = async() => {
-            if (winner && winner.userId === user.userId) {
-                await sleep(1500)
-                setLevelProgress({updatedXp: winner.xp, updatedLevel: winner.level})
-            }
+            const player = userId === player1.userId ? player1 : player2
+            await sleep(1500)
+            setLevelProgress({
+                updatedXp: player.xp,
+                updatedLevel: player.level
+            })
         }
         incrementLevel()
-    }, [winner, user])
+    }, [player1, player2, userId, dispatch])
 
     return (
         <Modal className="ui small modal" open onClose={() => false}>
@@ -52,5 +59,5 @@ export const PlayAgain = React.memo(({winner, user}) => {
 
 PlayAgain.propTypes = {
     user: PropTypes.object.isRequired,
-    winner: PropTypes.object
+    gameResult: PropTypes.object.isRequired
 }

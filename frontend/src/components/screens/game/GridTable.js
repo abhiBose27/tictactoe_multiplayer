@@ -7,13 +7,15 @@ export const GridTable = React.memo(({
     board,
     socket,
     userId,
-    winner
+    winnerUserId,
+    winningPattern
 }) => {
     
     const getClassName = (row, col) => {
-        if (!winner)
+        if (!winnerUserId)
             return "cell"
-        return winner.winningPattern.find(e => e.row === row && e.col === col) !== undefined && userId === winner.userId ? "winning-cell": "cell"
+        return winningPattern.find(e => e.row === row && e.col === col) !== undefined 
+               && userId === winnerUserId ? "winning-cell": "cell"
     }
 
     const onCellClick = (event) => {
@@ -57,7 +59,8 @@ export const GridTable = React.memo(({
 
 GridTable.propTypes = {
     userId: PropTypes.string,
+    winnerUserId: PropTypes.string,
     board: PropTypes.array.isRequired,
     socket: PropTypes.object.isRequired,
-    winner: PropTypes.object
+    winningPattern: PropTypes.array.isRequired
 }

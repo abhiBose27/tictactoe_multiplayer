@@ -3,7 +3,7 @@ export const ACTIONS = {
     ADD_USER: "add_user",
     ADD_GAME: "add_game",
     GAME_BOARD: "game_board",
-    GAME_WINNER: "game_winner",
+    GAME_RESULT: "game_result",
     GAME_MESSAGE: "game_message",
     GAME_LOADING: "game_loading",
     GAME_PLAY_AGAIN: "game_play_again",

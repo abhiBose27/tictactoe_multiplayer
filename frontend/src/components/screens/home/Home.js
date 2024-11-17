@@ -8,7 +8,7 @@ import { LoginForm } from "./LoginForm"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { ERRORS, MESSAGES } from "../../../Messages"
 import { ACTIONS } from "../../../Actions"
-import { initUserState } from "../../../Reducer"
+import { initState } from "../../../Reducer"
 
 
 export const Home = ({socket}) => {
@@ -87,8 +87,8 @@ export const Home = ({socket}) => {
                     setAuthError(messagePayload.message)
                     break
                 case MESSAGES.LOGOUT:
-                    dispatch({type: ACTIONS.LOGIN, payload: initUserState.isLoggedIn})
-                    dispatch({type: ACTIONS.ADD_USER, payload: initUserState.user})
+                    dispatch({type: ACTIONS.LOGIN, payload: initState.isLoggedIn})
+                    dispatch({type: ACTIONS.ADD_USER, payload: initState.user})
                     break
                 default:
                     break;

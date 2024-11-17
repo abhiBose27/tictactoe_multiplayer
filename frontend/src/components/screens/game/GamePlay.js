@@ -13,7 +13,7 @@ export const GamePlay = React.memo(({
     gameState,
 }) => {
 
-    const { board, playFireworks, winner } = gameState
+    const { board, playFireworks, gameResult } = gameState
     return (
         <div className="game">
             <PlayerLogo player={player1} userId={userId}/>
@@ -21,7 +21,8 @@ export const GamePlay = React.memo(({
                 board={board}
                 socket={socket}
                 userId={userId}
-                winner={winner}
+                winnerUserId={gameResult.winnerUserId}
+                winningPattern={gameResult.winningPattern}
             />
             <PlayerLogo player={player2} userId={userId}/>
             {

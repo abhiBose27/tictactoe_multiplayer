@@ -9,59 +9,64 @@ import { GameLoading } from "./GameLoading"
 import { GamePlay } from "./GamePlay"
 import { sleep } from "../../../Helper"
 import { Header } from "../../assets/Header"
-import { gameReducer, initGameState, initUserState } from "../../../Reducer"
+import { gameReducer, initGameState, initState } from "../../../Reducer"
 import { ACTIONS } from "../../../Actions"
 
 
 export const Game = ({socket}) => {
-    const navigate                  = useNavigate()
-    const dispatch                  = useDispatch()
-    const { user, game }            = useSelector(state => state.user)
-    const [gameState, gameDispatch] = useReducer(gameReducer, initGameState(user.userId === game.player1.userId))
-    const { userId, userName }      = user
+    const navigate                    = useNavigate()
+    const dispatch                    = useDispatch()
+    const { user, game }              = useSelector(state => state.user)
+    const { userId, userName }        = user
+    const { gameId, player1, player2} = game
+    const [gameState, gameDispatch]   = useReducer(gameReducer, initGameState(userId === player1.userId))
     const {
         isGameLoading,
         gameMessage,
         playAgain, 
-        winner, 
+        gameResult, 
         board
     } = gameState
 
     const onGameOver = useCallback(async(payload) => {
-        const winner    = payload.winner
-        const isForfeit = payload.isForfeit
-        if (winner) {
-            gameDispatch({type: ACTIONS.GAME_WINNER, payload: {
-                xp: winner.xp,
-                level: winner.level,
-                userId: winner.userId,
-                winningPattern: winner.winningPattern
-            }})
-            if (winner.userId !== userId)
-                gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "You lost"})
-            else {
-                if (isForfeit)
-                    gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "Opponent left the game. You won"})
-                else
-                    gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "You won"})
-                gameDispatch({type: ACTIONS.GAME_PLAY_FIREWORKS, payload: true})
-            }
-        }
-        else 
+        const winnerUserId   = payload.winnerUserId
+        const isForfeit      = payload.isForfeit
+        const winningPattern = payload.winningPattern
+        const player1        = payload.crossPlayer
+        const player2        = payload.circlePlayer
+        if (payload.gameId !== gameId)
+            return
+        if (!winnerUserId)
             gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "Draw"})
-        await sleep(winner && winner.userId === userId ? 6000 : 2000)
+        else if (winnerUserId !== userId)
+            gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "You lost"})
+        else if (isForfeit)
+            gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "Opponent left the game. You won!"})
+        else
+            gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: "You won!"})
+        gameDispatch({type: ACTIONS.GAME_RESULT, payload: {
+            isForfeit,
+            winnerUserId,
+            winningPattern,
+            player1,
+            player2
+        }})
+        gameDispatch({type: ACTIONS.GAME_PLAY_FIREWORKS, payload: winnerUserId === userId})
+        await sleep(winnerUserId === userId ? 6000: 2000)
         gameDispatch({type: ACTIONS.GAME_PLAY_AGAIN, payload: true})
-    }, [userId])
+    }, [userId, gameId])
 
     const onMove = useCallback(payload => {
-        const moveSymbol = payload.userId === game.player2.userId ? "O" : "X"
+        if (payload.gameId !== gameId)
+            return
+        const moveSymbol = payload.userId === game.player1.userId ? "X" : "O"
         const moveCoords = payload.move
         const newBoard = [...board]
         newBoard[moveCoords.row][moveCoords.col] = moveSymbol
         const message = payload.userId === userId ? "Opponent's Turn" : "Your Turn"
         gameDispatch({type: ACTIONS.GAME_BOARD,   payload: newBoard})
         gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: message})
-    }, [board, game, userId])
+    }, [board, game, userId, gameId])
 
     useEffect(() => {
         if (sessionStorage.getItem("pageRefresh"))
@@ -78,20 +83,19 @@ export const Game = ({socket}) => {
 
     useEffect(() => {
         socket.onmessage = async(event) => {
-            const message        = JSON.parse(event.data)
-            const messageType    = message.type
-            const messagePayload = message.payload
-            switch (messageType) {
+            const message = JSON.parse(event.data)
+            const payload = message.payload
+            switch (message.type) {
                 case MESSAGES.MOVE:
-                    onMove(messagePayload)
+                    onMove(payload)
                     break
                 case MESSAGES.GAME_OVER:
-                    await onGameOver(messagePayload)
+                    await onGameOver(payload)
                     break
                 case MESSAGES.LOGOUT:
-                    dispatch({type: ACTIONS.LOGIN, payload: initUserState.isLoggedIn})
-                    dispatch({type: ACTIONS.ADD_USER, payload: initUserState.user})
-                    dispatch({type: ACTIONS.ADD_GAME, payload: initUserState.game})
+                    dispatch({type: ACTIONS.LOGIN, payload: initState.isLoggedIn})
+                    dispatch({type: ACTIONS.ADD_USER, payload: initState.user})
+                    dispatch({type: ACTIONS.ADD_GAME, payload: initState.game})
                     navigate("/", { replace: true })
                     break              
                 default:
@@ -103,40 +107,26 @@ export const Game = ({socket}) => {
     return (
         <>
             <Header socket={socket} userName={userName} userId={userId}/>
-            {
-                isGameLoading ?
-                <>
-                    <MessageHeader 
-                        userId={userId} 
-                        winner={winner} 
-                        gameMessage={"Get Ready!"}
-                    />
-                    <GameLoading
-                        userId={userId}
-                        player1={game.player1} 
-                        player2={game.player2}
-                    />
-                </> :
-                <>
-                    <MessageHeader 
-                        userId={userId} 
-                        winner={winner}
-                        gameMessage={gameMessage}
-                    />
-                    <GamePlay
-                        userId={userId}
-                        socket={socket}
-                        gameState={gameState}
-                        player1={game.player1}
-                        player2={game.player2}
-                    />
-                </>
+            <MessageHeader
+                userId={userId}
+                gameMessage={isGameLoading ? "Get Ready!" : gameMessage}
+                winnerUserId={isGameLoading ? null : gameResult.winnerUserId}
+            />
+            {isGameLoading ? <GameLoading
+                    userId={userId}
+                    player1={player1} 
+                    player2={player2}
+                /> : <GamePlay
+                    userId={userId}
+                    socket={socket}
+                    player1={player1}
+                    player2={player2}
+                    gameState={gameState}
+                />
             }
-            {
-                playAgain && 
-                <PlayAgain
+            {playAgain && <PlayAgain
                     user={user}
-                    winner={winner}
+                    player1={gameResult}
                 />
             }
         </>

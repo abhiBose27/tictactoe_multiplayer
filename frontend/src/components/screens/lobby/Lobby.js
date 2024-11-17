@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Loader } from "semantic-ui-react"
 import { useNavigate } from "react-router-dom"
@@ -6,7 +6,7 @@ import PropTypes from "prop-types"
 import { MESSAGES } from "../../../Messages"
 import { Header } from "../../assets/Header"
 import { ACTIONS } from "../../../Actions"
-import { initUserState } from "../../../Reducer"
+import { initState } from "../../../Reducer"
 
 
 export const Lobby = ({socket}) => {
@@ -14,6 +14,22 @@ export const Lobby = ({socket}) => {
     const dispatch             = useDispatch()
     const { user }             = useSelector(state => state.user)
     const { userId, userName } = user
+
+    const onGameStarted = useCallback(payload => {
+        if (userId !== payload.crossPlayer.userId && userId !== payload.circlePlayer.userId)
+            return
+        dispatch({type: ACTIONS.ADD_GAME, payload: {
+            gameId: payload.gameId,
+            player1: {
+                userId: payload.crossPlayer.userId,
+                userName: payload.crossPlayer.userName
+            }, 
+            player2: {
+                userId: payload.circlePlayer.userId,
+                userName: payload.circlePlayer.userName
+            }
+        }})
+    }, [dispatch, userId])
 
     useEffect(() => {
         if (sessionStorage.getItem("pageRefresh"))
@@ -23,36 +39,16 @@ export const Lobby = ({socket}) => {
     useEffect(() => {
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data)
-            const messagePayload = message.payload
+            const payload = message.payload
             switch (message.type) {
-                case MESSAGES.GAME_ADDED:
-                    dispatch({type: ACTIONS.ADD_GAME, payload: {
-                        ...initUserState.game,
-                        gameId: messagePayload.gameId,
-                        player1: {
-                            userId: messagePayload.crossPlayer.userId,
-                            userName: messagePayload.crossPlayer.userName
-                        }
-                    }})
-                    break
                 case MESSAGES.GAME_STARTED:
-                    dispatch({type: ACTIONS.ADD_GAME, payload: {
-                        isStarted: true,
-                        gameId: messagePayload.gameId,
-                        player1: {
-                            userId: messagePayload.crossPlayer.userId,
-                            userName: messagePayload.crossPlayer.userName
-                        }, player2: {
-                            userId: messagePayload.circlePlayer.userId,
-                            userName: messagePayload.circlePlayer.userName
-                        }
-                    }})
-                    navigate(`/game/${messagePayload.gameId}`, { replace: true })
+                    onGameStarted(payload)
+                    navigate(`/game/${payload.gameId}`, { replace: true })
                     break
                 case MESSAGES.LOGOUT:
-                    dispatch({type: ACTIONS.LOGIN, payload: initUserState.isLoggedIn})
-                    dispatch({type: ACTIONS.ADD_USER, payload: initUserState.user})
-                    dispatch({type: ACTIONS.ADD_GAME, payload: initUserState.game})
+                    dispatch({type: ACTIONS.LOGIN,    payload: initState.isLoggedIn})
+                    dispatch({type: ACTIONS.ADD_USER, payload: initState.user})
+                    dispatch({type: ACTIONS.ADD_GAME, payload: initState.game})
                     navigate("/", { replace: true })
                     break
                 default:
@@ -64,7 +60,7 @@ export const Lobby = ({socket}) => {
             payload: {userId}
         }))
        
-    }, [socket, userId, userName, dispatch, navigate])
+    }, [socket, dispatch, navigate, userId, onGameStarted])
 
     return (
         <>

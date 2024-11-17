@@ -17,7 +17,6 @@ export const Header = React.memo(({socket, userName, userId}) => {
             {userName && <MenuItem><p style={{fontStyle: "italic"}}>{`Hello ${userName}!`}</p></MenuItem>}
             <MenuMenu position="right">
                 <MenuItem icon="log out" onClick={onClickLogOut}/>
-                <MenuItem name="Help"/>
             </MenuMenu>
         </Menu>
     )

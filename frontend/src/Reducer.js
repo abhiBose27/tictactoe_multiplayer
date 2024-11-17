@@ -1,6 +1,6 @@
 import { ACTIONS } from "./Actions"
 
-export const initUserState = {
+export const initState = {
     user: {
         xp: null,
         level: null,
@@ -8,7 +8,6 @@ export const initUserState = {
         userName: null
     },
     game: {
-        isStarted: false, 
         gameId: null, 
         player1: { userId: null, userName: null }, 
         player2: { userId: null, userName: null }
@@ -31,7 +30,13 @@ export const initFormState = {
 
 export const initGameState = (isPlayer1) => {
     return {
-        winner: null,
+        gameResult: {
+            isForfeit: false,
+            winnerUserId: null,
+            winningPattern: [],
+            player1: { userId: null, userName: null, xp: null, level: null},
+            player2: { userId: null, userName: null, xp: null, level: null},
+        },
         playAgain: false,
         isGameLoading: true,
         playFireworks: false,
@@ -40,7 +45,7 @@ export const initGameState = (isPlayer1) => {
     }
 }
 
-export const userReducer = (state = initUserState, action) => {
+export const userReducer = (state = initState, action) => {
     switch (action.type) {
         case ACTIONS.ADD_USER:
             return {...state, user: action.payload}
@@ -65,8 +70,8 @@ export const gameReducer = (state, action) => {
             return {...state, board: action.payload}
         case ACTIONS.GAME_PLAY_FIREWORKS:
             return {...state, playFireworks: action.payload}
-        case ACTIONS.GAME_WINNER:
-            return {...state, winner: action.payload}
+        case ACTIONS.GAME_RESULT:
+            return {...state, gameResult: action.payload}
         default:
             return state
     }

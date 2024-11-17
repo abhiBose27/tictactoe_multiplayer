@@ -3,11 +3,11 @@ import PropTypes from "prop-types"
 import { Header } from "semantic-ui-react"
 
 
-export const MessageHeader = React.memo(({userId, winner, gameMessage}) => {
+export const MessageHeader = React.memo(({userId, winnerUserId, gameMessage}) => {
     const getMessageColor = () => {
-        if (!winner)
+        if (!winnerUserId)
             return "grey"
-        if (userId === winner.userId)
+        if (userId === winnerUserId)
             return "green"
         return "red"
     }
@@ -23,6 +23,6 @@ export const MessageHeader = React.memo(({userId, winner, gameMessage}) => {
 
 MessageHeader.propTypes = {
     userId: PropTypes.string,
-    winner: PropTypes.object,
+    winnerUserId: PropTypes.string,
     gameMessage: PropTypes.string.isRequired
 }
