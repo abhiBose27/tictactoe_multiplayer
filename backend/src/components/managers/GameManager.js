@@ -16,6 +16,7 @@ const {
     checkParamsRequired, 
     getRouteConfig 
 } = require("../../helper.js")
+const { insertGames } = require("../../database/Games.js")
 
 
 class GameManager {
@@ -503,6 +504,7 @@ class GameManager {
             }
         })
         const users = this.userManager.getUsersFromGameId(game.gameId)
+        await insertGames(this.dbClient, game)
         for (const u of users) {
             await updateUserStats(this.dbClient, u.userId, u.level, u.xp)
             this.userManager.removeUserFromGame(u.userId)
