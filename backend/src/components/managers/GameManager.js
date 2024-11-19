@@ -44,8 +44,8 @@ class GameManager {
 
     displayGameManagerStatus() {
         // Display Users
-        console.log(this.userManager.getUsers())
-        console.log(this.userManager.getUserIdToGameId())
+        console.log("LoggedIn Users: ", this.userManager.getUsers())
+        console.log("UserIdToGameId: ", this.userManager.getUserIdToGameId())
         console.log("---------------\n\n")
     }
 
@@ -86,8 +86,8 @@ class GameManager {
 
     enableMessageHandler(socket) {
         socket.on("message", async (crude_message) => {
+            console.log("RECEIVED: ", crude_message.toString())
             const message = JSON.parse(crude_message.toString())
-            console.log("Received", message)
             if (!this.isValidParams(message))
                 return this.#invalidParams(socket)
 
