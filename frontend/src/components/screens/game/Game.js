@@ -59,10 +59,11 @@ export const Game = ({socket}) => {
     const onMove = useCallback(payload => {
         if (payload.gameId !== gameId)
             return
-        const moveSymbol = payload.userId === game.player1.userId ? "X" : "O"
-        const moveCoords = payload.move
-        const newBoard = [...board]
-        newBoard[moveCoords.row][moveCoords.col] = moveSymbol
+        const moveSymbol   = payload.userId === game.player1.userId ? "X" : "O"
+        const row          = payload.row
+        const col          = payload.col
+        const newBoard     = [...board]
+        newBoard[row][col] = moveSymbol
         const message = payload.userId === userId ? "Opponent's Turn" : "Your Turn"
         gameDispatch({type: ACTIONS.GAME_BOARD,   payload: newBoard})
         gameDispatch({type: ACTIONS.GAME_MESSAGE, payload: message})
@@ -85,6 +86,7 @@ export const Game = ({socket}) => {
         socket.onmessage = async(event) => {
             const message = JSON.parse(event.data)
             const payload = message.payload
+            console.log(payload)
             switch (message.type) {
                 case MESSAGES.MOVE:
                     onMove(payload)
@@ -126,7 +128,7 @@ export const Game = ({socket}) => {
             }
             {playAgain && <PlayAgain
                     user={user}
-                    player1={gameResult}
+                    gameResult={gameResult}
                 />
             }
         </>

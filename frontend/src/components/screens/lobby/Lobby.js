@@ -55,10 +55,11 @@ export const Lobby = ({socket}) => {
                     break
             }
         }
-        socket.send(JSON.stringify({
-            type: MESSAGES.JOIN_GAME,
-            payload: {userId}
-        }))
+        if (userId)
+            socket.send(JSON.stringify({
+                type: MESSAGES.JOIN_GAME,
+                payload: {userId}
+            }))
        
     }, [socket, dispatch, navigate, userId, onGameStarted])
 

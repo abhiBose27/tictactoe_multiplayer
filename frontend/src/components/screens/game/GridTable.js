@@ -26,10 +26,8 @@ export const GridTable = React.memo(({
             type: MESSAGES.MOVE,
             payload: {
                 userId,
-                move: {
-                    row: row,
-                    col: col
-                }
+                row,
+                col
             }
         }))
     }
