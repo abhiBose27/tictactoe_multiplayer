@@ -1,4 +1,4 @@
-export const MESSAGES = {
+const MESSAGES = {
     MOVE: "move",
     LOGIN: "login",
     LOGOUT: "logout",
@@ -11,11 +11,12 @@ export const MESSAGES = {
     GAME_STARTED: "game_started",
 }
 
-export const ERRORS = {
+const ERRORS = {
     INVALID_SOCKET: "invalid_socket",
     INVALID_CREDENTIALS: "invalid_credentials",
     INVALID_MOVE: "invalid_move",
     INVALID_PARAMETERS: "invalid_parameters",
+    INVALID_GAMEID: "invalid_game_id",
     MISMATCH_PASSWORDS: "missmatch_passwords",
     USER_REGISTERED: "user_registered",
     USERNAME_TAKEN: "username_taken",
@@ -24,4 +25,10 @@ export const ERRORS = {
     USER_NOT_LOGGED_IN: "user_not_logged_in",
     USER_IN_GAME: "user_in_game",
     USER_NOT_IN_GAME: "user_not_in_game",
+    GAME_FULL: "game_full"
+}
+
+module.exports = {
+    MESSAGES,
+    ERRORS
 }

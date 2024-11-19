@@ -1,9 +1,8 @@
-import psql from "pg"
-import dotenv from "dotenv"
-const { Client } = psql
+const { Client } = require("pg")
+const { configDotenv } = require("dotenv")
 
-export const connectToDb = () => {
-    dotenv.config()
+const connectToDb = () => {
+    configDotenv()
     const client = new Client({
         user: process.env.PGUSER,
         host: process.env.PGHOST,
@@ -21,3 +20,5 @@ export const connectToDb = () => {
 	})
     return client
 }
+
+module.exports = { connectToDb };

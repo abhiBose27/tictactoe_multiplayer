@@ -1,4 +1,4 @@
-export class UserManager {
+class UserManager {
 
     constructor() {
         this.users          = []
@@ -7,13 +7,29 @@ export class UserManager {
         this.userIdToGameId = new Map()
     }
 
+    getUsers() {
+        return this.users
+    }
+
+    getUserIdToGameId() {
+        return this.userIdToGameId
+    }
+
     addUser(user, socket) {
+        const isAlreadyAdded = this.users.find(u => u.userId === user.userId) !== undefined
+        if (isAlreadyAdded)
+            this.users = this.users.filter(u => u.userId !== user.userId)
         this.users.push(user)
         this.userIdToSocket.set(user.userId, socket)
     }
 
     addUserToGame(user, gameId) {
-        this.gameIdToUsers.set(gameId, [...(this.gameIdToUsers.get(gameId) || []), user])
+        const users          = this.getUsersFromGameId(gameId)
+        const isAlreadyAdded = users.find(u => u.userId === user.userId) !== undefined
+        if (isAlreadyAdded)
+            this.gameIdToUsers.set(gameId, [...(users.filter(u => u.userId !== user.userId)), user])
+        else
+            this.gameIdToUsers.set(gameId, [...(this.getUsersFromGameId(gameId)), user])
         this.userIdToGameId.set(user.userId, gameId)
     }
 
@@ -67,4 +83,8 @@ export class UserManager {
         const users = this.getUsersFromGameId(gameId)
         users.forEach(user => this.sendMessage(user.userId, message))
     }
+}
+
+module.exports = {
+    UserManager
 }

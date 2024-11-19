@@ -1,4 +1,4 @@
-export class User {
+class User {
     
     constructor(userId, userName, level, xp) {
         this.userId   = userId
@@ -28,4 +28,8 @@ export class User {
         this.level -= 1
         this.xp = 90
     }
+}
+
+module.exports = {
+    User
 }

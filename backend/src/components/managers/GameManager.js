@@ -1,27 +1,32 @@
-import assert from "assert"
-import { Game } from "./Game.js"
-import { UserManager } from "./UserManager.js"
-import { User } from "./User.js"
-import { 
+const assert          = require("assert")
+const { UserManager } = require("../managers/UserManager.js")
+const { Game }        = require("../entities/Game.js")
+const { User }        = require("../entities/User.js")
+const { 
     getUserByCredentials, 
     getUserByEmailId, 
     getUserByUsername, 
     insertUserByCredentials, 
     updateUserStats 
-} from "../database/Users.js"
-import { connectToDb } from "../database/Connection.js"
-import { ERRORS, MESSAGES } from "../messages.js"
+} = require("../../database/Users.js")
+const { ERRORS, MESSAGES } = require("../../messages.js")
+const { 
+    isRequiredPropsInParams, 
+    checkParamsOptionals, 
+    checkParamsRequired, 
+    getRouteConfig 
+} = require("../../helper.js")
 
 
-export class GameManager {
+class GameManager {
     
     /*
     create table users (userid uuid, emailid text, password text, username text, level int, xp int, unique (emailid));
     */
-    constructor() {
+    constructor(dbClient) {
         this.games = []
         this.pendingGameId = null
-        this.dbClient = connectToDb()
+        this.dbClient = dbClient
         this.userManager = new UserManager()
     }
 
@@ -39,39 +44,51 @@ export class GameManager {
 
     displayGameManagerStatus() {
         // Display Users
-        console.log("Games: ")
-        this.games.forEach(game => console.log(game.gameId))
-        console.log("User Manager: ")
-        console.log(this.userManager)
+        console.log(this.userManager.getUsers())
+        console.log(this.userManager.getUserIdToGameId())
         console.log("---------------\n\n")
     }
 
     getRouteToCallback() {
         return {
-            [MESSAGES.LOGIN]: this.login.bind(this),
-            [MESSAGES.LOGOUT]: this.logout.bind(this),
-            [MESSAGES.SIGNUP]: this.signup.bind(this),
-            [MESSAGES.MOVE]: this.makeMove.bind(this),
+            [MESSAGES.MOVE]     : this.makeMove.bind(this),
+            [MESSAGES.LOGIN]    : this.login.bind(this),
+            [MESSAGES.LOGOUT]   : this.logout.bind(this),
+            [MESSAGES.SIGNUP]   : this.signup.bind(this),
             [MESSAGES.EXIT_GAME]: this.exitGame.bind(this),
-            [MESSAGES.JOIN_GAME]: this.joinGame.bind(this) 
+            [MESSAGES.JOIN_GAME]: this.joinGame.bind(this),
         }
     }
 
-    getRouteToParameters() {
-        return {
-            "signup"   : ["emailId", "userName", "password", "confirmPassword"],
-            "login"    : ["emailId", "password"],
-            "move"     : ["userId", "move"],
-            "logout"   : ["userId"],
-            "join_game": ["userId"],
-            "exit_game": ["userId"],
+    isValidParams(message) {
+        if (Object.keys(message).toString() !== ["type", "payload"].toString())
+            return false
+        const messageType = message.type
+        const payload     = message.payload
+        const routeConfig = getRouteConfig()[messageType]
+        const requiredProps = routeConfig.required
+        const optionalProps = routeConfig.optional
+        
+        if (isRequiredPropsInParams(payload, requiredProps) && !optionalProps)
+            return false
+
+        if (optionalProps) {
+            for (const prop in payload) {
+                if (!(prop in requiredProps) && !(prop in optionalProps))
+                    return false
+            }
+            if (!checkParamsOptionals(payload, optionalProps))
+                return false
         }
+        // To check all the required parameters are provided
+        return checkParamsRequired(payload, requiredProps)
     }
 
     enableMessageHandler(socket) {
         socket.on("message", async (crude_message) => {
             const message = JSON.parse(crude_message.toString())
-            if (!this.#checkParams(message))
+            console.log("Received", message)
+            if (!this.isValidParams(message))
                 return this.#invalidParams(socket)
 
             const routeCallback = this.getRouteToCallback()[message.type]
@@ -275,9 +292,16 @@ export class GameManager {
         }
 
         const user = this.userManager.getUserFromUserId(userId)
-        if (!this.pendingGameId)
-            return this.#noPendingGame(user)
-        return this.#pendingGame(user)
+        if (payload.existingGameId)
+            return this.#addToExistingGame(user, payload.existingGameId)
+        if (payload.createLobby)
+            return this.#addToNewGame(user)
+        if (!this.pendingGameId) {
+            this.pendingGameId = this.#addToNewGame(user)
+            return
+        }
+        this.#addToExistingGame(user, this.pendingGameId)
+        this.pendingGameId = null
     }
 
     async exitGame(payload, socket) {
@@ -327,7 +351,7 @@ export class GameManager {
 
     async makeMove(payload, socket) {
         // Check if the user is already logged in
-        const { userId, move } = payload
+        const { userId, row, col } = payload
          if (!this.#isUserLoggedIn(userId)) {
             return socket.send(JSON.stringify({
                 type: MESSAGES.GAME_ERROR,
@@ -364,7 +388,7 @@ export class GameManager {
         const user   = this.userManager.getUserFromUserId(userId)
         const gameId = this.userManager.getGameIdFromUserId(userId)
         const game   = this.getGameFromGameId(gameId)
-        const moveMade = game.makeMove(user, move)
+        const moveMade = game.makeMove(user, {row, col})
         if (!moveMade) {
             return this.userManager.sendMessage(userId, {
                 type: MESSAGES.GAME_ERROR,
@@ -378,7 +402,7 @@ export class GameManager {
         // Move is valid so send the messages to the players of this game
         this.userManager.broadcast(gameId, {
             type: MESSAGES.MOVE,
-            payload: {gameId, userId, move}
+            payload: {gameId, userId, row, col}
         })
 
         // Check if the game is over
@@ -400,9 +424,11 @@ export class GameManager {
         }))
     }
 
-    #noPendingGame(user) {
+    #addToNewGame(user) {
         const game = new Game()
-        game.setPlayer(user)
+        const isPlayerAdded = game.setPlayer(user)
+        if (!isPlayerAdded)
+            throw new Error("Cant add a player to a new game")
         this.addGame(game)
         this.userManager.addUserToGame(user, game.gameId)
         this.userManager.broadcast(game.gameId, {
@@ -411,19 +437,36 @@ export class GameManager {
                 gameId: game.gameId,
             }
         })
-        this.pendingGameId = game.gameId
+        return game.gameId
     }
 
-    #pendingGame(user) {
-        const game = this.getGameFromGameId(this.pendingGameId)
-        if (game === undefined) 
-            throw new Error(`Error: Incorrect pending game Id ${this.pendingGameId}`)
-        game.setPlayer(user)
-        this.userManager.addUserToGame(user, this.pendingGameId)
-        this.userManager.broadcast(this.pendingGameId, {
+    #addToExistingGame(user, gameId) {
+        const game = this.getGameFromGameId(gameId)
+        if (game === undefined) {
+            return this.userManager.sendMessage(user.userId, {
+                type: MESSAGES.GAME_ERROR,
+                payload: {
+                    errorType: ERRORS.INVALID_GAMEID,
+                    message: "invalid gameId"
+                }
+            })
+        } 
+        //throw new Error(`Error: Incorrect game Id ${gameId}`)
+        const isPlayerAdded = game.setPlayer(user)
+        if (!isPlayerAdded) {
+            return this.userManager.sendMessage(user.userId, {
+                type: MESSAGES.GAME_ERROR,
+                payload: {
+                    errorType: ERRORS.GAME_FULL,
+                    message: "game is already full"
+                }
+            })
+        }
+        this.userManager.addUserToGame(user, gameId)
+        this.userManager.broadcast(gameId, {
             type: MESSAGES.GAME_STARTED,
             payload: {
-                gameId: this.pendingGameId,
+                gameId: gameId,
                 crossPlayer: {
                     userId: game.player1.userId,
                     userName: game.player1.userName
@@ -434,7 +477,6 @@ export class GameManager {
                 },
             }
         })
-        this.pendingGameId = null
     }
 
     async #endGame(game) {
@@ -476,21 +518,6 @@ export class GameManager {
         return Math.abs(level - user.level) <= 2
     } */
 
-    #checkParams(message) {
-        if (Object.keys(message).toString() !== ["type", "payload"].toString())
-            return false
-        const messageType = message.type
-        const payload     = message.payload
-        const requiredProps = this.getRouteToParameters()[messageType]
-        if (Object.keys(payload).toString() !== requiredProps.toString())
-            return false
-        for (const prop in payload) {
-            if (!payload[prop] || payload[prop].length === 0)
-                return false
-        }
-        return true
-    }
-
     #isUserConnectedWithTheSocket(userId, socket) {
         return socket === this.userManager.getSocketFromUserId(userId)
     }
@@ -503,4 +530,8 @@ export class GameManager {
     #isUserLoggedIn(userId) {
         return this.userManager.getUserFromUserId(userId) !== undefined
     }
+}
+
+module.exports = {
+    GameManager
 }

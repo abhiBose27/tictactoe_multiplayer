@@ -1,10 +1,11 @@
-import { v4 as uuidv4 } from "uuid"
-import { TicTacToe } from "tictactoe_game_class"
+const { v4 } = require("uuid")
+const { TicTacToe } = require("tictactoe_game_class")
 
-export class Game {
+
+class Game {
 
     constructor() {
-        this.gameId        = uuidv4()
+        this.gameId        = v4()
         this.startTime     = new Date()
         this.board         = new TicTacToe(3)
         this.player1       = null
@@ -37,6 +38,8 @@ export class Game {
     }
 
     setPlayer(user) {
+        if (this.player1 && this.player2)
+            return false
         const randomPlayer = Math.floor(Math.random() * 2) + 1
         if (randomPlayer === 1) {
             if (!this.player1)
@@ -44,12 +47,13 @@ export class Game {
             else if (!this.player2)
                 this.player2 = user
         }
-        else if (randomPlayer === 2) {
+        else {
             if (!this.player2)
                 this.player2 = user
             else if (!this.player1)
                 this.player1 = user
         }
+        return true
     }
 
     setWinner(user) {
@@ -113,4 +117,8 @@ export class Game {
         this.board.setTurn()
         return true
     }
+}
+
+module.exports = {
+    Game
 }

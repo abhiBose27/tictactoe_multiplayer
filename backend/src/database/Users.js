@@ -1,12 +1,12 @@
-import { v4 as uuidv4 } from "uuid"
-import assert from "assert"
+const { v4 } = require("uuid")
+const assert = require("assert")
 
 const processReturnData = (userInfo) => {
     assert(userInfo.rows.length < 2)
     return userInfo.rows.length === 1 ? userInfo.rows[0] : null
 }
 
-export const getUserByCredentials = async(client, emailId, password) => {
+const getUserByCredentials = async(client, emailId, password) => {
     try {
         const userInfo = await client.query("select * from users where emailid = $1 and password = $2", [emailId, password])
         return processReturnData(userInfo)
@@ -15,7 +15,7 @@ export const getUserByCredentials = async(client, emailId, password) => {
     }
 }
 
-export const getUserByEmailId = async(client, emailId) => {
+const getUserByEmailId = async(client, emailId) => {
     try {
         const userInfo = await client.query("select * from users where emailid = $1", [emailId])
         return processReturnData(userInfo)
@@ -24,7 +24,7 @@ export const getUserByEmailId = async(client, emailId) => {
     }
 }
 
-export const getUserByUsername = async(client, username) => {
+const getUserByUsername = async(client, username) => {
     try {
         const userInfo = await client.query("select * from users where username = $1", [username])
         return processReturnData(userInfo)
@@ -33,7 +33,7 @@ export const getUserByUsername = async(client, username) => {
     }
 }
 
-export const getUserByUserId = async(client, userId) => {
+const getUserByUserId = async(client, userId) => {
     try {
         const userInfo = await client.query("select * from users where userid = $1", [userId])
         return processReturnData(userInfo)
@@ -42,10 +42,10 @@ export const getUserByUserId = async(client, userId) => {
     }
 }
 
-export const insertUserByCredentials = async(client, emailId, password, userName) => {
+const insertUserByCredentials = async(client, emailId, password, userName) => {
     try {
         const userInfo = await client.query("insert into users (userid, emailid, password, username, level, xp) values ($1, $2, $3, $4, $5, $6) returning *",
-            [uuidv4(), emailId, password, userName, 0, 0]
+            [v4(), emailId, password, userName, 0, 0]
         )
         return processReturnData(userInfo)
     } catch (error) {
@@ -53,7 +53,7 @@ export const insertUserByCredentials = async(client, emailId, password, userName
     }
 }
 
-export const updateUserStats = async(client, userId, level, xp) => {
+const updateUserStats = async(client, userId, level, xp) => {
     try {
         const userInfo = await client.query("update users set level = $1, xp = $2 where userid = $3",
             [level, xp, userId]
@@ -62,4 +62,12 @@ export const updateUserStats = async(client, userId, level, xp) => {
     } catch (error) {
         throw new Error(`Error: Update user stats ${error}`)
     }
+}
+
+module.exports = {
+    getUserByCredentials,
+    getUserByEmailId,
+    getUserByUsername,
+    insertUserByCredentials,
+    updateUserStats
 }
