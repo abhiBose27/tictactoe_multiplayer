@@ -86,7 +86,6 @@ export const Game = ({socket}) => {
         socket.onmessage = async(event) => {
             const message = JSON.parse(event.data)
             const payload = message.payload
-            console.log(payload)
             switch (message.type) {
                 case MESSAGES.MOVE:
                     onMove(payload)
