@@ -33,6 +33,15 @@ const getUserByUsername = async(client, username) => {
     }
 }
 
+const getUsers = async(client) => {
+    try {
+        const usersInfo = await client.query("select * from users")
+        return usersInfo.rows
+    } catch (error) {
+        throw new Error(`Error: Get Users ${error}`)
+    }
+}
+
 const getUserByUserId = async(client, userId) => {
     try {
         const userInfo = await client.query("select * from users where userid = $1", [userId])
@@ -68,6 +77,7 @@ module.exports = {
     getUserByCredentials,
     getUserByEmailId,
     getUserByUsername,
+    getUsers,
     insertUserByCredentials,
     updateUserStats
 }

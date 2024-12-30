@@ -112,4 +112,11 @@ describe("check_params", () => {
         }
         expect(gameManager.isValidParams(mockMessage)).toBe(true)
     })
+
+    test("get_users", () => {
+        const mockMessage = {
+            type: MESSAGES.GET_USERS,
+        }
+        expect(gameManager.isValidParams(mockMessage)).toBe(true)
+    })
 })

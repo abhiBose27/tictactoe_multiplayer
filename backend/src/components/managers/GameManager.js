@@ -7,7 +7,8 @@ const {
     getUserByEmailId, 
     getUserByUsername, 
     insertUserByCredentials, 
-    updateUserStats 
+    updateUserStats, 
+    getUsers
 } = require("../../database/Users.js")
 const { ERRORS, MESSAGES } = require("../../messages.js")
 const { 
@@ -58,10 +59,13 @@ class GameManager {
             [MESSAGES.SIGNUP]   : this.signup.bind(this),
             [MESSAGES.EXIT_GAME]: this.exitGame.bind(this),
             [MESSAGES.JOIN_GAME]: this.joinGame.bind(this),
+            [MESSAGES.GET_USERS]: this.getUsers.bind(this)
         }
     }
 
     isValidParams(message) {
+        if (message.type === MESSAGES.GET_USERS && Object.keys(message).toString() === ["type"].toString())
+            return true
         if (Object.keys(message).toString() !== ["type", "payload"].toString())
             return false
         const messageType = message.type
@@ -93,7 +97,10 @@ class GameManager {
                 return this.#invalidParams(socket)
 
             const routeCallback = this.getRouteToCallback()[message.type]
-            await routeCallback(message.payload, socket)
+            if (message.payload === undefined)
+                await routeCallback(socket)
+            else
+                await routeCallback(message.payload, socket)
             return this.displayGameManagerStatus()
         })
     }
@@ -410,6 +417,25 @@ class GameManager {
         if (game.getIsGameOver()) {
             await this.#endGame(game)
         }
+    }
+
+    async getUsers(socket) {
+        const userInfos = await getUsers(this.dbClient)
+        const updatedUserInfos = userInfos.map(u => {
+            return {
+                userid: u.userid,
+                emailid: u.emailid,
+                username: u.username,
+                level: u.level,
+                xp: u.xp
+            }
+        })
+        return socket.send(JSON.stringify({
+            type: MESSAGES.GET_USERS,
+            payload: {
+                users: updatedUserInfos
+            }
+        }))
     }
 
 

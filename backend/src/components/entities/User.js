@@ -17,16 +17,22 @@ class User {
     }
 
     levelDown() {
-        if (this.xp - 20 > 0) {
-            this.xp -= 20
-            return
-        }
-        if (this.level === 0) {
+        // Security level check
+        if (this.level < 0) {
             this.xp = 0
+            this.level = 0
             return
         }
-        this.level -= 1
-        this.xp = 90
+
+        // Core 
+        if (this.xp - 20 > 0)
+            this.xp -= 20
+        else if (this.level === 0)
+            this.xp = 0
+        else {
+            this.level -= 1
+            this.xp = 90
+        }
     }
 }
 

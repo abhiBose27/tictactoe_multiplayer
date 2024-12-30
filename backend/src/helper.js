@@ -65,7 +65,8 @@ const getRouteConfig = () => {
             required: {
                 userId: "string"
             }
-        }
+        },
+        get_users: {}
     }
 }
 
