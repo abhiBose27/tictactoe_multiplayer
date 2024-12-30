@@ -3,6 +3,7 @@ export const MESSAGES = {
     LOGIN: "login",
     LOGOUT: "logout",
     SIGNUP: "signup",
+    GET_USERS: "get_users",
     EXIT_GAME: "exit_game",
     JOIN_GAME: "join_game",
     GAME_OVER: "game_over",
