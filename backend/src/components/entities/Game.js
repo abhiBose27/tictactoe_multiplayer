@@ -6,7 +6,7 @@ class Game {
 
     constructor() {
         this.gameId        = v4()
-        this.startTime     = new Date()
+        this.startTime     = null
         this.board         = new TicTacToe(3)
         this.player1       = null
         this.player2       = null
@@ -116,6 +116,10 @@ class Game {
         }
         this.board.setTurn()
         return true
+    }
+
+    startGame() {
+        this.startTime = new Date()
     }
 }
 

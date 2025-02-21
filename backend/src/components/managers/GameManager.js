@@ -489,6 +489,7 @@ class GameManager {
                 }
             })
         }
+        game.startGame()
         this.userManager.addUserToGame(user, gameId)
         this.userManager.broadcast(gameId, {
             type: MESSAGES.GAME_STARTED,
